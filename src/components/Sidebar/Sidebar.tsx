@@ -6,6 +6,7 @@ const sidebarNavLinks = [
   "dashboard",
   "expenses",
   "recommendations",
+  "settings",
   "logout",
 ];
 
