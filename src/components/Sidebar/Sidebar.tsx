@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 
 const sidebarNavLinks = [
   "dashboard",
-  "expenses",
+  "analytics",
   "recommendations",
   "settings",
   "logout",
