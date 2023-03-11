@@ -5,52 +5,71 @@ import Sidebar from "./components/Sidebar/Sidebar";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Expenses from "./pages/Expenses/Expenses";
 import Auth from "./pages/Authentication/Auth";
-import Anyalytics from "./pages/Analytics/Analytics"
+import Anyalytics from "./pages/Analytics/Analytics";
+import Settings from "./pages/Settings/Settings";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
+  function DashboardPage() {
+    return (
+      <>
+        <Sidebar />
+        <Expenses />
+      </>
+    );
+  }
+
+  function AnalyticsPage() {
+    return (
+      <>
+        <Sidebar />
+        <Anyalytics />
+      </>
+    );
+  }
+
+  function RecommendationsPage() {
+    return (
+      <>
+        <Sidebar />
+        <Expenses />
+      </>
+    );
+  }
+
+  function SettingsPage() {
+    return (
+      <>
+        <Sidebar />
+        <Settings />
+      </>
+    );
+  }
+
+  function LoginPage() {
+    return (
+      <>
+        <Auth />
+      </>
+    );
+  }
+
   return (
     <>
       <Router>
         <Switch>
-          <Route path="/Dashboard">
-            <Sidebar />
-            <Expenses />
-          </Route>
+          <Route exact path="/" component={LoginPage} />
+          <Route exact path="/login" component={LoginPage} />
+          <Route path="/logout" component={LoginPage} />
+          <ProtectedRoute exact path="/dashboard" component={DashboardPage} />
+          <ProtectedRoute exact path="/analytics" component={AnalyticsPage} />
+          <ProtectedRoute
+            exact
+            path="/recommendations"
+            component={RecommendationsPage}
+          />
+          <ProtectedRoute exact path="/settings" component={SettingsPage} />
         </Switch>
-
-        <Switch>
-          <Route path="/Analytics">
-            <Sidebar />
-            <Anyalytics />
-          </Route>
-        </Switch>
-
-        <Switch>
-          <Route path="/Recommendations">
-            <Sidebar />
-            <Expenses />
-          </Route>
-        </Switch>
-
-        <Switch>
-          <Route path="/Settings">
-            <Sidebar />
-            <Expenses />
-          </Route>
-        </Switch>
-
-        <Switch>
-          <Route path="/Login">
-            <Auth />
-          </Route>
-        </Switch>
-
-        <Switch>
-          <Route path="/Logout">
-            <Auth />
-          </Route>
-        </Switch>
-        
       </Router>
     </>
   );

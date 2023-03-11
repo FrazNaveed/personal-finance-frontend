@@ -1,33 +1,46 @@
 import styles from "./Settings.module.scss";
-import {
-  BarChart,
-  Bar,
-  ResponsiveContainer,
-  Cell,
-  XAxis,
-  Tooltip,
-} from "recharts";
 import { useState } from "react";
 
 export default function Expenses() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  function handleKeyPress(event: any) {
+    if (event.key === "-" || event.key === "+") {
+      event.preventDefault();
+    }
+  }
 
   return (
     <>
-      <div className={styles.expenses}>
-        <div className={styles.expensesCard}>
-          <div className={styles.expensesOverview}>
-            <div className={styles.expensesHeader}>
-              <p className={styles.expensesTitle}>Settings</p>
-            </div>
+      <div className={styles.settings}>
+        <div className={styles.settingsCard}>
+          <div className={styles.settingsOverview}>
+            <div className={styles.settingsHeader}>
+              <p className={styles.settingsTitle}>Settings</p>
 
-            <div className={styles.textbox_container}>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                className={styles.textbox}
-              />
-              <button className={styles.button}>Submit</button>
+              <div className={styles.textbox_container}>
+                <input
+                  type="number"
+                  placeholder="Enter Annual Income"
+                  className={styles.textbox}
+                  step="any"
+                  min="0"
+                  onKeyPress={handleKeyPress}
+                />
+                <button className={styles.button}>Update</button>
+              </div>
+
+              <div className={styles.textbox_container}>
+                <input type="email" placeholder="Update email" />
+                <button className={styles.button}>Update</button>
+              </div>
+
+              <div className={styles.textbox_container}>
+                <input
+                  type="password"
+                  placeholder="Update Password"
+                  className={styles.textbox}
+                />
+                <button className={styles.button}>Update</button>
+              </div>
             </div>
           </div>
         </div>

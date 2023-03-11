@@ -1,4 +1,6 @@
 import styles from "./Expenses.module.scss";
+import Sidebar from "../../components/Sidebar"
+
 import personOne from "../../assets/png/person1.png";
 import personTwo from "../../assets/png/person2.png";
 import personThree from "../../assets/png/person3.png";
@@ -223,6 +225,7 @@ export default function Expenses() {
 
   return (
     <>
+      <Sidebar />
       <main className={styles.expenses}>
         <div className={styles.expensesCard}>
           <section className={styles.expensesOverview}>

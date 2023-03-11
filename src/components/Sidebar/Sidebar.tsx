@@ -10,6 +10,10 @@ const sidebarNavLinks = [
   "logout",
 ];
 
+const handleLogout = () => {
+  localStorage.removeItem("token");
+};
+
 export default function Sidebar() {
   const location = useLocation();
 
@@ -37,6 +41,11 @@ export default function Sidebar() {
                         : styles.sidebarNavLink
                     }
                     to={`/${sidebarNavLink}`}
+                    onClick={() => {
+                      if (sidebarNavLink === "logout") {
+                        handleLogout();
+                      }
+                    }}
                   >
                     {sidebarNavLink.charAt(0).toUpperCase() +
                       sidebarNavLink.slice(1)}

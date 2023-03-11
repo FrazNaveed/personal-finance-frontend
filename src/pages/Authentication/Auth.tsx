@@ -1,11 +1,73 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+
 import "./Auth.css";
 
 export default function (props: any) {
+  const history = useHistory();
   let [authMode, setAuthMode] = useState("signin");
+  const [fname, setfname] = useState("");
+  const [lname, setlname] = useState("");
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
+
+  const [_email, set_email] = useState("");
+  const [_password, set_password] = useState("");
 
   const changeAuthMode = () => {
     setAuthMode(authMode === "signin" ? "signup" : "signin");
+  };
+
+  const handleSubmitSignup = async (e: any) => {
+    e.preventDefault();
+    const response = await fetch("http://localhost:5000/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        fname: fname,
+        lname: lname,
+        email: email,
+        password: password,
+      }),
+    });
+    const data = await response.json();
+    console.log(data);
+    if (data.status === "ok") {
+      alert("Successfully Created User");
+    } else {
+      alert("Error Creating User");
+    }
+  };
+
+  const handleSubmitSignIn = async (e: any) => {
+    e.preventDefault();
+
+    const response = await fetch("http://localhost:5000/login-user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        email: _email,
+        password: _password,
+      }),
+    });
+    const data = await response.json();
+    console.log(data);
+    if (data.status === "ok") {
+      alert("Login Success");
+
+      localStorage.setItem("token", data.data);
+      history.push("/Dashboard");
+    } else {
+      alert("Error Loging in");
+    }
   };
 
   if (authMode === "signin") {
@@ -26,6 +88,9 @@ export default function (props: any) {
                 type="email"
                 className="form-control mt-1"
                 placeholder="Enter email"
+                onChange={(e) => {
+                  set_email(e.target.value);
+                }}
               />
             </div>
             <div className="form-group mt-3">
@@ -34,10 +99,13 @@ export default function (props: any) {
                 type="password"
                 className="form-control mt-1"
                 placeholder="Enter password"
+                onChange={(e) => {
+                  set_password(e.target.value);
+                }}
               />
             </div>
             <div className="d-grid gap-2 mt-3">
-              <button type="submit" className="btn btn-primary">
+              <button className="btn btn-primary" onClick={handleSubmitSignIn}>
                 Submit
               </button>
             </div>
@@ -59,11 +127,25 @@ export default function (props: any) {
             </span>
           </div>
           <div className="form-group mt-3">
-            <label>Full Name</label>
+            <label>First Name</label>
             <input
-              type="email"
+              type="text"
               className="form-control mt-1"
-              placeholder="Full Name"
+              placeholder="First Name"
+              onChange={(e) => {
+                setfname(e.target.value);
+              }}
+            />
+          </div>
+          <div className="form-group mt-3">
+            <label>Last Name</label>
+            <input
+              type="text"
+              className="form-control mt-1"
+              placeholder="Last Name"
+              onChange={(e) => {
+                setlname(e.target.value);
+              }}
             />
           </div>
           <div className="form-group mt-3">
@@ -72,6 +154,9 @@ export default function (props: any) {
               type="email"
               className="form-control mt-1"
               placeholder="Email Address"
+              onChange={(e) => {
+                setemail(e.target.value);
+              }}
             />
           </div>
           <div className="form-group mt-3">
@@ -80,10 +165,13 @@ export default function (props: any) {
               type="password"
               className="form-control mt-1"
               placeholder="Password"
+              onChange={(e) => {
+                setpassword(e.target.value);
+              }}
             />
           </div>
           <div className="d-grid gap-2 mt-3">
-            <button type="submit" className="btn btn-primary">
+            <button className="btn btn-primary" onClick={handleSubmitSignup}>
               Submit
             </button>
           </div>
