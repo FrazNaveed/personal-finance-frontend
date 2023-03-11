@@ -26,9 +26,9 @@ export default function Expenses() {
     { name: "Dec", value: 250 },
   ];
 
-  const onMouseOver = (data: any, index: number) => setActiveIndex(index);
+  const onMouseOver = (data, index) => setActiveIndex(index);
 
-  const formatTooltip = (value: any) => {
+  const formatTooltip = (value) => {
     return [`$${value}`];
   };
   return (
@@ -65,7 +65,7 @@ export default function Expenses() {
                       />
                     ))}
                   </Bar>
-                  {/* <Tooltip formatter={formatTooltip} /> */}
+                  <Tooltip formatter={formatTooltip} />
                 </BarChart>
               </ResponsiveContainer>
               <div
