@@ -1,0 +1,93 @@
+$textbox-bg: #f9f9f9;
+$textbox-color: #333;
+$textbox-border: 2px solid #ddd;
+$button-bg: #007bff;
+$button-color: #fff;
+
+.expenses {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 75vw;
+  background-color: #101010;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expensesCard {
+  background-color: white;
+  width: 95%;
+  height: 95%;
+  border-radius: 30px;
+
+  display: flex;
+  border: 1px solid;
+}
+
+.expensesOverview {
+  width: 100%;
+  padding: 5rem;
+
+}
+
+.expensesHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.expensesTitle {
+  font-weight: 600;
+  font-size: 40px;
+}
+
+
+
+.textbox_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.textbox-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.textbox {
+  font-size: 16px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: $textbox-bg;
+  color: $textbox-color;
+  border: $textbox-border;
+  flex: 1;
+
+  &:focus {
+    outline: none;
+    border-color: $button-bg;
+  }
+}
+
+.button {
+  font-size: 16px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: $button-bg;
+  color: $button-color;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($button-bg, 10%);
+  }
+}
