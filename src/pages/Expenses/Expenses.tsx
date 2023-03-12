@@ -1,9 +1,5 @@
 import styles from "./Expenses.module.scss";
-import personOne from "../../assets/png/person1.png";
-import personTwo from "../../assets/png/person2.png";
-import personThree from "../../assets/png/person3.png";
-import addIcon from "../../assets/png/addIcon.png";
-import { BarChart, Bar, ResponsiveContainer, Cell } from "recharts";
+import Modal from "react-modal";
 import { useState } from "react";
 import optionIcon from "../../assets/png/menuIcon.png";
 import cartIcon from "../../assets/svg/cartIcon.svg";
@@ -11,137 +7,70 @@ import transportIcon from "../../assets/svg/transportIcon.svg";
 import houseIcon from "../../assets/svg/houseIcon.svg";
 import boxes from "../../assets/png/boxes.png";
 import plant from "../../assets/png/plant.png";
+Modal.setAppElement("#root");
+
+const customStyles = {
+  overlay: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  content: {
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "80%",
+    maxWidth: "600px",
+    maxHeight: "80vh",
+    borderRadius: "8px",
+    padding: "24px",
+    boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)",
+    backgroundColor: "white",
+    border: "none",
+  },
+};
+
+const categories = [
+  "Food",
+  "Transportation",
+  "Entertainment",
+  "Utilities",
+  "Other",
+];
 
 export default function Expenses() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const data = [
-    {
-      name: "Page A",
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Page B",
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Page C",
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Page D",
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Page E",
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: "Page F",
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: "Page G",
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-    {
-      name: "Page A",
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Page B",
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Page C",
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Page D",
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Page E",
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: "Page F",
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: "Page G",
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-    {
-      name: "Page A",
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Page B",
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Page C",
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Page D",
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Page E",
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: "Page F",
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: "Page G",
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-  ];
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [expenseName, setExpenseName] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const [expenseDate, setExpenseDate] = useState("");
+  const [expenseTime, setExpenseTime] = useState("");
+  const [expenseAmount, setExpenseAmount] = useState("");
+
+  const handleAddExpense = (e: any) => {
+    e.preventDefault();
+    const newExpense = {
+      name: expenseName,
+      category: selectedCategory,
+      date: expenseDate,
+      time: expenseTime,
+      amount: expenseAmount,
+    };
+    // addExpense(newExpense);
+    handleCloseModal();
+  };
+
+  function handleKeyPress(event: any) {
+    if (event.key === "-" || event.key === "+") {
+      event.preventDefault();
+    }
+  }
+
+  const handleOpenModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalIsOpen(false);
+  };
+
   const todayExpenses = [
     {
       id: 1,
@@ -219,8 +148,6 @@ export default function Expenses() {
     },
   ];
 
-  const onMouseOver = (data: any, index: number) => setActiveIndex(index);
-
   return (
     <>
       <main className={styles.expenses}>
@@ -229,51 +156,14 @@ export default function Expenses() {
             <div className={styles.expensesHeader}>
               <p className={styles.expensesTitle}>Expenses</p>
               <div className={styles.expensesActions}>
-                <div className={styles.personImages}>
-                  <img
-                    className={styles.personOne}
-                    src={personOne}
-                    alt="person one"
-                  />
-                  <img
-                    className={styles.personTwo}
-                    src={personTwo}
-                    alt="person two"
-                  />
-                  <img
-                    className={styles.personThree}
-                    src={personThree}
-                    alt="person three"
-                  />
-                </div>
-                <button>
-                  <img className={styles.addIcon} src={addIcon} alt="add" />
+                <button
+                  className={styles.addExpenseButton}
+                  onClick={handleOpenModal}
+                >
+                  Create Expense
                 </button>
               </div>
             </div>
-
-            <p className={styles.dateRange}>01 - 25 March, 2020</p>
-            <ResponsiveContainer width="100%" height="9%">
-              <BarChart data={data}>
-                <Bar
-                  dataKey="uv"
-                  fill="rgba(21, 122, 255, .2)"
-                  onMouseOver={onMouseOver}
-                >
-                  {data.map((entry, index) => (
-                    <Cell
-                      cursor="pointer"
-                      fill={
-                        index === activeIndex
-                          ? "rgb(21, 122, 255)"
-                          : "rgba(21, 122, 255, .2)"
-                      }
-                      key={index}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
 
             <div className={styles.expensesOverviewHeader}>
               <p className={styles.expensesOverviewTitle}>Today</p>
@@ -284,6 +174,102 @@ export default function Expenses() {
                   alt="options"
                 />
               </button>
+            </div>
+
+            <div>
+              <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={handleCloseModal}
+                contentLabel="Example Modal"
+                style={customStyles}
+              >
+                <h2 className={styles.heading}>Add Expense</h2>
+                <button
+                  onClick={handleCloseModal}
+                  className={styles.close_button}
+                >
+                  &times;
+                </button>
+
+                <form onSubmit={handleAddExpense} className={styles.formGroup}>
+                  <div>
+                    <label htmlFor="expense-name" className={styles.label}>
+                      Expense Name
+                    </label>
+                    <input
+                      type="text"
+                      id="expense-name"
+                      value={expenseName}
+                      onChange={(e) => setExpenseName(e.target.value)}
+                      className={styles.input}
+                      placeholder="e.g. Grace & Savour Restaurant"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="category" className={styles.label}>
+                      Category
+                    </label>
+                    <select
+                      id="category"
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className={styles.select}
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="expense-date" className={styles.label}>
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      id="expense-date"
+                      value={expenseDate}
+                      onChange={(e) => setExpenseDate(e.target.value)}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="expense-time" className={styles.label}>
+                      Time
+                    </label>
+                    <input
+                      type="time"
+                      id="expense-time"
+                      value={expenseTime}
+                      onChange={(e) => setExpenseTime(e.target.value)}
+                      className={styles.input}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="expense-amount" className={styles.label}>
+                      Amount
+                    </label>
+                    <input
+                      type="number"
+                      id="expense-amount"
+                      value={expenseAmount}
+                      onChange={(e) => setExpenseAmount(e.target.value)}
+                      className={styles.input}
+                      step="any"
+                      min="0"
+                      onKeyPress={handleKeyPress}
+                      placeholder="e.g. $1600"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className={styles.addExpenseButton_margin}
+                  >
+                    Submit
+                  </button>
+                </form>
+              </Modal>
             </div>
 
             <ul>
@@ -350,9 +336,6 @@ export default function Expenses() {
                 </li>
               ))}
             </ul>
-
-
-            
           </section>
 
           <section className={styles.moneyOverview}>
@@ -393,7 +376,8 @@ export default function Expenses() {
               <img className={styles.plant} src={plant} alt="plant" />
               <p className={styles.saveMoneyTitle}>Save more money</p>
               <p className={styles.saveMoneyInfo}>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique, a.
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                Similique, a.
               </p>
               <button className={styles.button} type="button">
                 VIEW TIPS

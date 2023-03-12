@@ -59,10 +59,7 @@ export default function (props: any) {
       }),
     });
     const data = await response.json();
-    console.log(data);
     if (data.status === "ok") {
-      alert("Login Success");
-
       localStorage.setItem("token", data.data);
       history.push("/Dashboard");
     } else {

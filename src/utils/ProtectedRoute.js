@@ -7,7 +7,7 @@ function ProtectedRoute({ component: Component, ...rest }) {
   function isTokenExpired(token) {
     if (token) {
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
-      const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
+      const expirationTime = decodedToken.exp * 1000;
       const currentTime = Date.now();
       return currentTime < expirationTime;
     }
