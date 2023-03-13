@@ -22,8 +22,7 @@
   
   .expensesOverview {
     width: 100%;
-    padding: 5rem;
-  
+    padding: 5rem;  
   }
 
   .mainBody{
@@ -31,8 +30,9 @@
     padding: 5rem;
     height: 95%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
+    gap: 20px
   }
   
   .expensesHeader {

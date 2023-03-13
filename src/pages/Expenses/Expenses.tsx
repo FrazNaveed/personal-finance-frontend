@@ -1,52 +1,28 @@
 import styles from "./Expenses.module.scss";
 import Modal from "react-modal";
 import { useState, useEffect } from "react";
-import axios from "axios";
-import optionIcon from "../../assets/png/menuIcon.png";
 import cartIcon from "../../assets/svg/cartIcon.svg";
 import transportIcon from "../../assets/svg/transportIcon.svg";
 import houseIcon from "../../assets/svg/houseIcon.svg";
 import boxes from "../../assets/png/boxes.png";
 import plant from "../../assets/png/plant.png";
+import { validateDate } from "../../utils/validateDate";
+import { categories } from "../../utils/categories";
+import { customStyles } from "../../utils/externalCSS";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
 Modal.setAppElement("#root");
 
-const customStyles = {
-  overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  content: {
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "100%",
-    maxWidth: "600px",
-    maxHeight: "80vh",
-    borderRadius: "8px",
-    padding: "34px",
-    boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)",
-    backgroundColor: "white",
-    border: "none",
-  },
-};
-
-const categories = [
-  "Food and Drinks",
-  "Groceries",
-  "Rent or Mortgage",
-  "Utilities",
-  "Transportation",
-  "Personal care",
-  "Clothing and Accessories",
-  "Entertainment",
-  "Travel",
-  "Gifts and Donations",
-  "Medical and Health",
-  "Insurance",
-  "Education",
-  "Home Maintenance and Repairs",
-  "Miscellaneous",
-];
+interface Expenses {
+  amount: number;
+  category: string;
+  date: string;
+  expenseName: string;
+  time: string;
+  _id: number;
+}
 
 export default function Expenses() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -55,9 +31,17 @@ export default function Expenses() {
   const [expenseDate, setExpenseDate] = useState("");
   const [expenseTime, setExpenseTime] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
+  const [todayExpenses, setTodayExpenses] = useState<Expenses[]>([]);
+  // const [previousExpenses, setPreviousExpenses] = useState([]);
+  // const [spendCategories, setSpendCategories] = useState([]);
 
   const handleAddExpense = async (e: any) => {
     const email = localStorage.getItem("email");
+
+    if (!validateDate(expenseDate)) {
+      return;
+    }
+
     await fetch("http://localhost:5000/saveExpense", {
       method: "POST",
       headers: {
@@ -97,35 +81,61 @@ export default function Expenses() {
     setModalIsOpen(false);
   };
 
-  const todayExpenses = [
-    {
-      id: 1,
-      expense: "Grocery",
-      time: "5:12 pm",
-      location: "xyz location",
-      price: 326.8,
-      icon: cartIcon,
-      iconBackgroundColor: "#32a7e2",
-    },
-    {
-      id: 2,
-      expense: "Transportation",
-      time: "5:12 pm",
-      location: "xyz bus terminal",
-      price: 15.0,
-      icon: transportIcon,
-      iconBackgroundColor: "#B548C6",
-    },
-    {
-      id: 3,
-      expense: "Housing",
-      time: "5:12 pm",
-      location: "rent",
-      price: 185.75,
-      icon: houseIcon,
-      iconBackgroundColor: "#FF8700",
-    },
-  ];
+  useEffect(() => {
+    getTodayExpenses();
+  }, []);
+
+  const getTodayExpenses = async () => {
+    const result = await axios.get(
+      `${process.env.REACT_APP_API}/getTodayExpenses`,
+      {
+        params: {
+          email: localStorage.getItem("email"),
+        },
+      }
+    );
+    setTodayExpenses(result.data);
+  };
+
+  const deleteExpense = async (id: number) => {
+    const result = await axios.post(
+      `${process.env.REACT_APP_API}/deleteExpense`,
+      {
+        id: id,
+      }
+    );
+    console.log(result);
+  };
+
+  // const todayExpenses = [
+  //   {
+  //     id: 1,
+  //     expense: "Grocery",
+  //     time: "5:12 pm",
+  //     location: "xyz location",
+  //     price: 326.8,
+  //     icon: cartIcon,
+  //     iconBackgroundColor: "#32a7e2",
+  //   },
+  //   {
+  //     id: 2,
+  //     expense: "Transportation",
+  //     time: "5:12 pm",
+  //     location: "xyz bus terminal",
+  //     price: 15.0,
+  //     icon: transportIcon,
+  //     iconBackgroundColor: "#B548C6",
+  //   },
+  //   {
+  //     id: 3,
+  //     expense: "Housing",
+  //     time: "5:12 pm",
+  //     location: "rent",
+  //     price: 185.75,
+  //     icon: houseIcon,
+  //     iconBackgroundColor: "#FF8700",
+  //   },
+  // ];
   const previousExpenses = [
     {
       id: 1,
@@ -146,6 +156,7 @@ export default function Expenses() {
       iconBackgroundColor: "#4BA83D",
     },
   ];
+
   const spendCategories = [
     {
       id: 1,
@@ -241,24 +252,13 @@ export default function Expenses() {
               </div>
             </div>
 
-            <div className={styles.expensesOverviewHeader}>
-              <p className={styles.expensesOverviewTitle}>Today</p>
-              <button>
-                <img
-                  className={styles.expenseOption}
-                  src={optionIcon}
-                  alt="options"
-                />
-              </button>
-            </div>
-
             <div>
               <Modal
                 isOpen={modalIsOpen}
                 contentLabel="Add Expense"
                 style={customStyles}
               >
-                <h2 className={styles.heading}>Add Expense</h2>
+                <h2 className={styles.heading}>Add Details</h2>
                 <button
                   onClick={handleCloseModal}
                   className={styles.close_button}
@@ -347,8 +347,12 @@ export default function Expenses() {
               </Modal>
             </div>
 
+            <div className={styles.expensesOverviewHeader}>
+              <p className={styles.expensesOverviewTitle}>Today</p>
+            </div>
+
             <ul>
-              {todayExpenses.map((expense) => (
+              {todayExpenses.map((expense: any) => (
                 <li className={styles.expenseItem} key={expense.id}>
                   <div className={styles.expenseItemLeft}>
                     <div
@@ -359,16 +363,20 @@ export default function Expenses() {
                     </div>
                     <div className={styles.expenseItemDetails}>
                       <p className={styles.expenseItemTitle}>
-                        {expense.expense}
+                        {expense.category}
                       </p>
                       <p className={styles.expenseItemTime}>
-                        {expense.time} • {expense.location}
+                        {expense.time} • {expense.expenseName} • $
+                        {expense.amount}
                       </p>
                     </div>
                   </div>
-                  <p className={styles.expenseItemPrice}>
-                    {expense.price.toFixed(2)}
-                  </p>
+                  <button
+                    className={styles.delete_btn}
+                    onClick={() => deleteExpense(expense._id)}
+                  >
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
                 </li>
               ))}
             </ul>
@@ -377,13 +385,6 @@ export default function Expenses() {
               <p className={styles.expensesOverviewTitle}>
                 Monday, 23 March 2020
               </p>
-              <button>
-                <img
-                  className={styles.expenseOption}
-                  src={optionIcon}
-                  alt="options"
-                />
-              </button>
             </div>
 
             <ul>
@@ -401,13 +402,13 @@ export default function Expenses() {
                         {expense.expense}
                       </p>
                       <p className={styles.expenseItemTime}>
-                        {expense.time} • {expense.location}
+                        {expense.time} • {expense.location} • ${expense.price}
                       </p>
                     </div>
                   </div>
-                  <p className={styles.expenseItemPrice}>
-                    {expense.price.toFixed(2)}
-                  </p>
+                  <button className={styles.delete_btn}>
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
                 </li>
               ))}
             </ul>

@@ -1,4 +1,6 @@
+import React, { useMemo } from "react";
 import styles from "./Analytics.module.scss";
+import { categories } from "../../utils/categories";
 import {
   BarChart,
   Bar,
@@ -6,7 +8,10 @@ import {
   Cell,
   XAxis,
   Tooltip,
+  PieChart,
+  Pie,
 } from "recharts";
+
 import { useState } from "react";
 
 export default function Expenses() {
@@ -26,6 +31,16 @@ export default function Expenses() {
     { name: "Dec", value: 250 },
   ];
 
+  const piedata = useMemo(
+    () =>
+      categories.map((category, index) => ({
+        name: category,
+        value: Math.floor(Math.random() * 1000),
+        color: `hsl(${(index * 360) / categories.length}, 70%, 50%)`,
+      })),
+    [categories]
+  );
+
   const onMouseOver = (data: any, index: number) => setActiveIndex(index);
 
   const formatTooltip = (value: any) => {
@@ -41,75 +56,52 @@ export default function Expenses() {
             </div>
 
             <div className={styles.mainBody}>
-              <ResponsiveContainer width="50%" height="40%">
-                <BarChart data={data}>
-                  <XAxis
-                    dataKey="name"
-                    axisLine={{ stroke: "transparent" }}
-                    tickLine={{ stroke: "transparent" }}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill="rgba(21, 122, 255, .2)"
-                    onMouseOver={onMouseOver}
-                  >
-                    {data.map((entry, index) => (
-                      <Cell
-                        cursor="pointer"
-                        fill={
-                          index === activeIndex
-                            ? "rgb(21, 122, 255)"
-                            : "rgba(21, 122, 255, .2)"
-                        }
-                        key={index}
-                      />
-                    ))}
-                  </Bar>
-                  <Tooltip formatter={formatTooltip} />
-                </BarChart>
-              </ResponsiveContainer>
-              <div
-                style={{
-                  backgroundColor: "#fff",
-                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                  borderRadius: "8px",
-                  padding: "24px",
-                  width: "300px",
-                  height: "200px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textAlign: "center",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "48px",
-                    fontWeight: "bold",
-                    marginBottom: "24px",
-                    color: "#5c5c5c",
-                  }}
+              <BarChart data={data} width={530} height={300}>
+                <XAxis
+                  dataKey="name"
+                  axisLine={{ stroke: "transparent" }}
+                  tickLine={{ stroke: "transparent" }}
+                />
+                <Bar
+                  dataKey="value"
+                  fill="rgba(21, 122, 255, .2)"
+                  onMouseOver={onMouseOver}
                 >
-                  $20
-                </div>
-                <div
-                  style={{
-                    color: "#b4b4b4",
-                    fontSize: "16px",
-                    marginBottom: "16px",
-                  }}
-                ></div>
-                <div
-                  style={{
-                    fontSize: "24px",
-                    fontWeight: "bold",
-                    color: "#5c5c5c",
-                  }}
+                  {data.map((entry, index) => (
+                    <Cell
+                      cursor="pointer"
+                      fill={
+                        index === activeIndex
+                          ? "rgb(21, 122, 255)"
+                          : "rgba(21, 122, 255, .2)"
+                      }
+                      key={index}
+                    />
+                  ))}
+                </Bar>
+                <Tooltip formatter={formatTooltip} />
+              </BarChart>
+              <PieChart width={400} height={400}>
+                <Pie
+                  data={piedata}
+                  cx={200}
+                  cy={200}
+                  innerRadius={60}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  paddingAngle={5}
+                  dataKey="value"
+                  label={({ name, percent }) =>
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
                 >
-                  Total expenses
-                </div>
-              </div>
+                  {piedata.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+
+                <Tooltip />
+              </PieChart>
             </div>
           </div>
         </div>

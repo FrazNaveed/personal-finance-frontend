@@ -64,24 +64,6 @@
   align-items: center;
 }
 
-.personOne {
-  position: relative;
-  left: -73%;
-  z-index: 3;
-}
-
-.personTwo {
-  position: relative;
-  left: -83%;
-  z-index: 2;
-}
-
-.personThree {
-  position: relative;
-  left: -93%;
-  z-index: 1;
-}
-
 .addIcon {
   cursor: pointer;
   margin-left: -6rem;
@@ -112,7 +94,6 @@
 
 .expenseItem {
   margin: 1rem;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -195,14 +176,14 @@
   border-radius: 5px;
 }
 
+/* Default styling */
 .saveMoneyDiv {
-  width: 70%;
+  width: 90%;
   margin: 0 auto;
   background-color: #edf0f6;
   margin-top: 4rem;
   padding: 2rem;
   border-radius: 15px;
-
   position: relative;
 }
 
@@ -298,8 +279,8 @@
 .heading {
   margin-bottom: 24px;
   font-weight: bold;
-  font-size: 24px;
-  color: #333;
+  font-size: 30px;
+  color: rgb(63, 111, 187);
 }
 
 .formGroup {
@@ -357,4 +338,26 @@
   border-right: 4px solid transparent;
   pointer-events: none;
   transform: rotate(90deg);
+}
+
+
+.delete_btn {
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 50%;
+  color: black;
+  cursor: pointer;
+  font-size: 16px;
+  height: 20px;
+  padding: 12px;
+  width: 20px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.delete_btn:hover {
+  background-color: #f44336;
+  color: white;
 }
