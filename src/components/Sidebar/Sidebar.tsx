@@ -1,4 +1,5 @@
 import styles from "./Sidebar.module.scss";
+import { useState, useEffect } from "react";
 import samanthaImg from "../../assets/png/samantha.png";
 import { Link, useLocation } from "react-router-dom";
 
@@ -16,6 +17,30 @@ const handleLogout = () => {
 
 export default function Sidebar() {
   const location = useLocation();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    async function getUserDetails() {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5000/userData", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({
+          token: token,
+        }),
+      });
+      const result = await response.json();
+      setName(result.data.fname);
+      setEmail(result.data.email);
+      localStorage.setItem("email", result.data.email);
+    }
+    getUserDetails();
+  }, []);
 
   return (
     <>
@@ -26,8 +51,8 @@ export default function Sidebar() {
               {/* <img src={samanthaImg} alt="samantha" /> */}
               {/* <p className={styles.notifications}>4</p> */}
             </div>
-            <p className={styles.userName}>Samantha</p>
-            <p className={styles.userEmail}>samantha@email.com</p>
+            <p className={styles.userName}>{name}</p>
+            <p className={styles.userEmail}>{email}</p>
           </div>
 
           <nav className={styles.sidebarNav}>

@@ -1,12 +1,14 @@
 import styles from "./Expenses.module.scss";
 import Modal from "react-modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import optionIcon from "../../assets/png/menuIcon.png";
 import cartIcon from "../../assets/svg/cartIcon.svg";
 import transportIcon from "../../assets/svg/transportIcon.svg";
 import houseIcon from "../../assets/svg/houseIcon.svg";
 import boxes from "../../assets/png/boxes.png";
 import plant from "../../assets/png/plant.png";
+
 Modal.setAppElement("#root");
 
 const customStyles = {
@@ -17,11 +19,11 @@ const customStyles = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "80%",
+    width: "100%",
     maxWidth: "600px",
     maxHeight: "80vh",
     borderRadius: "8px",
-    padding: "24px",
+    padding: "34px",
     boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.3)",
     backgroundColor: "white",
     border: "none",
@@ -29,11 +31,21 @@ const customStyles = {
 };
 
 const categories = [
-  "Food",
-  "Transportation",
-  "Entertainment",
+  "Food and Drinks",
+  "Groceries",
+  "Rent or Mortgage",
   "Utilities",
-  "Other",
+  "Transportation",
+  "Personal care",
+  "Clothing and Accessories",
+  "Entertainment",
+  "Travel",
+  "Gifts and Donations",
+  "Medical and Health",
+  "Insurance",
+  "Education",
+  "Home Maintenance and Repairs",
+  "Miscellaneous",
 ];
 
 export default function Expenses() {
@@ -44,17 +56,31 @@ export default function Expenses() {
   const [expenseTime, setExpenseTime] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
 
-  const handleAddExpense = (e: any) => {
-    e.preventDefault();
-    const newExpense = {
-      name: expenseName,
-      category: selectedCategory,
-      date: expenseDate,
-      time: expenseTime,
-      amount: expenseAmount,
-    };
-    // addExpense(newExpense);
-    handleCloseModal();
+  const handleAddExpense = async (e: any) => {
+    const email = localStorage.getItem("email");
+    await fetch("http://localhost:5000/saveExpense", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        expenseName: expenseName,
+        category: selectedCategory,
+        date: expenseDate,
+        time: expenseTime,
+        amount: expenseAmount,
+        userId: email,
+      }),
+    })
+      .then(async (res: any) => {
+        alert("Successfully Saved");
+        handleCloseModal();
+      })
+      .catch((error) => {
+        alert("Error Sending Data");
+      });
   };
 
   function handleKeyPress(event: any) {
@@ -128,22 +154,72 @@ export default function Expenses() {
     },
     {
       id: 2,
-      category: "Shopping",
+      category: "Groceries",
       price: 1378.2,
     },
     {
       id: 3,
-      category: "Housing",
+      category: "Rent or Mortgage",
       price: 928.5,
     },
     {
       id: 4,
-      category: "Transportation",
+      category: "Utilities",
       price: 420.7,
     },
     {
       id: 5,
-      category: "Vehicle",
+      category: "Transportation",
+      price: 520,
+    },
+    {
+      id: 6,
+      category: "Clothing and Accessories",
+      price: 520,
+    },
+    {
+      id: 7,
+      category: "Entertainment",
+      price: 520,
+    },
+    {
+      id: 8,
+      category: "Travel",
+      price: 520,
+    },
+    {
+      id: 9,
+      category: "Gifts and Donations",
+      price: 520,
+    },
+    {
+      id: 10,
+      category: "Medical and Health",
+      price: 520,
+    },
+    {
+      id: 11,
+      category: "Insurance",
+      price: 520,
+    },
+    {
+      id: 12,
+      category: "Education",
+      price: 520,
+    },
+    {
+      id: 13,
+      category: "Home Maintenance and Repairs",
+      price: 520,
+    },
+    {
+      id: 14,
+      category: "Personal care",
+      price: 520,
+    },
+    {
+      id: 15,
+      category: "Miscellaneous",
       price: 520,
     },
   ];
@@ -179,8 +255,7 @@ export default function Expenses() {
             <div>
               <Modal
                 isOpen={modalIsOpen}
-                onRequestClose={handleCloseModal}
-                contentLabel="Example Modal"
+                contentLabel="Add Expense"
                 style={customStyles}
               >
                 <h2 className={styles.heading}>Add Expense</h2>
@@ -191,84 +266,84 @@ export default function Expenses() {
                   &times;
                 </button>
 
-                <form onSubmit={handleAddExpense} className={styles.formGroup}>
-                  <div>
-                    <label htmlFor="expense-name" className={styles.label}>
-                      Expense Name
-                    </label>
-                    <input
-                      type="text"
-                      id="expense-name"
-                      value={expenseName}
-                      onChange={(e) => setExpenseName(e.target.value)}
-                      className={styles.input}
-                      placeholder="e.g. Grace & Savour Restaurant"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="category" className={styles.label}>
-                      Category
-                    </label>
-                    <select
-                      id="category"
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className={styles.select}
-                    >
-                      {categories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="expense-date" className={styles.label}>
-                      Date
-                    </label>
-                    <input
-                      type="date"
-                      id="expense-date"
-                      value={expenseDate}
-                      onChange={(e) => setExpenseDate(e.target.value)}
-                      className={styles.input}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="expense-time" className={styles.label}>
-                      Time
-                    </label>
-                    <input
-                      type="time"
-                      id="expense-time"
-                      value={expenseTime}
-                      onChange={(e) => setExpenseTime(e.target.value)}
-                      className={styles.input}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="expense-amount" className={styles.label}>
-                      Amount
-                    </label>
-                    <input
-                      type="number"
-                      id="expense-amount"
-                      value={expenseAmount}
-                      onChange={(e) => setExpenseAmount(e.target.value)}
-                      className={styles.input}
-                      step="any"
-                      min="0"
-                      onKeyPress={handleKeyPress}
-                      placeholder="e.g. $1600"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className={styles.addExpenseButton_margin}
+                <div>
+                  <label htmlFor="expense-name" className={styles.label}>
+                    Expense Name
+                  </label>
+                  <input
+                    type="text"
+                    id="expense-name"
+                    value={expenseName}
+                    onChange={(e) => setExpenseName(e.target.value)}
+                    className={styles.input}
+                    placeholder="e.g. Grace & Savour Restaurant"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="category" className={styles.label}>
+                    Category
+                  </label>
+                  <select
+                    id="category"
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className={styles.select}
                   >
-                    Submit
-                  </button>
-                </form>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="expense-date" className={styles.label}>
+                    Date
+                  </label>
+                  <input
+                    type="date"
+                    id="expense-date"
+                    value={expenseDate}
+                    onChange={(e) => setExpenseDate(e.target.value)}
+                    className={styles.input}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="expense-time" className={styles.label}>
+                    Time
+                  </label>
+                  <input
+                    type="time"
+                    id="expense-time"
+                    required
+                    pattern="[0-2][0-9]:[0-5][0-9]"
+                    value={expenseTime}
+                    onChange={(e) => setExpenseTime(e.target.value)}
+                    className={styles.input}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="expense-amount" className={styles.label}>
+                    Amount
+                  </label>
+                  <input
+                    type="number"
+                    id="expense-amount"
+                    value={expenseAmount}
+                    onChange={(e) => setExpenseAmount(e.target.value)}
+                    className={styles.input}
+                    step="any"
+                    min="1"
+                    onKeyPress={handleKeyPress}
+                    placeholder="e.g. $1600"
+                  />
+                </div>
+                <button
+                  onClick={handleAddExpense}
+                  className={styles.addExpenseButton_margin}
+                >
+                  Submit
+                </button>
               </Modal>
             </div>
 
