@@ -41,6 +41,12 @@ interface prevExpenses {
   }[];
 }
 
+interface spendCategories {
+  _id: string;
+  category: string;
+  amount: number;
+}
+
 export default function Expenses() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [expenseName, setExpenseName] = useState("");
@@ -50,7 +56,7 @@ export default function Expenses() {
   const [expenseAmount, setExpenseAmount] = useState("");
   const [todayExpenses, setTodayExpenses] = useState<Expenses[]>([]);
   const [previousExpenses, setPreviousExpenses] = useState<prevExpenses[]>([]);
-  // const [spendCategories, setSpendCategories] = useState([]);
+  const [spendCategories, setSpendCategories] = useState<spendCategories[]>([]);
 
   function handleKeyPress(event: any) {
     if (event.key === "-" || event.key === "+") {
@@ -69,6 +75,7 @@ export default function Expenses() {
   useEffect(() => {
     getTodayExpenses();
     getPreviousExpenses();
+    getCategoriesSpending();
   }, []);
 
   const getTodayExpenses = async () => {
@@ -94,6 +101,20 @@ export default function Expenses() {
     );
     setPreviousExpenses(result.data);
   };
+
+  const getCategoriesSpending = async () => {
+    const result = await axios.get(
+      `${process.env.REACT_APP_API}/getCategoriesSpending`,
+      {
+        params: {
+          email: localStorage.getItem("email"),
+        },
+      }
+    );
+    setSpendCategories(result.data);
+    console.log(result.data);
+  };
+
   const handleAddExpense = async (e: any) => {
     const email = localStorage.getItem("email");
 
@@ -120,6 +141,7 @@ export default function Expenses() {
       .then(async (res: any) => {
         getTodayExpenses();
         getPreviousExpenses();
+        getCategoriesSpending();
         alert("Successfully Saved");
         handleCloseModal();
       })
@@ -137,139 +159,12 @@ export default function Expenses() {
       );
       getTodayExpenses();
       getPreviousExpenses();
+      getCategoriesSpending();
       alert(result.data);
     } catch (error) {
       console.log(error);
     }
   };
-
-  // const todayExpenses = [
-  //   {
-  //     id: 1,
-  //     expense: "Grocery",
-  //     time: "5:12 pm",
-  //     location: "xyz location",
-  //     price: 326.8,
-  //     icon: cartIcon,
-  //     iconBackgroundColor: "#32a7e2",
-  //   },
-  //   {
-  //     id: 2,
-  //     expense: "Transportation",
-  //     time: "5:12 pm",
-  //     location: "xyz bus terminal",
-  //     price: 15.0,
-  //     icon: transportIcon,
-  //     iconBackgroundColor: "#B548C6",
-  //   },
-  //   {
-  //     id: 3,
-  //     expense: "Housing",
-  //     time: "5:12 pm",
-  //     location: "rent",
-  //     price: 185.75,
-  //     icon: houseIcon,
-  //     iconBackgroundColor: "#FF8700",
-  //   },
-  // ];
-  // const previousExpenses = [
-  //   {
-  //     id: 1,
-  //     expense: "Food and Drink",
-  //     time: "5:12 pm",
-  //     location: "xyz restaurant",
-  //     price: 156.0,
-  //     icon: cartIcon,
-  //     iconBackgroundColor: "#DC3434",
-  //   },
-  //   {
-  //     id: 2,
-  //     expense: "Entertainment",
-  //     time: "5:12 pm",
-  //     location: "cineplex",
-  //     price: 35.2,
-  //     icon: transportIcon,
-  //     iconBackgroundColor: "#4BA83D",
-  //   },
-  // ];
-
-  const spendCategories = [
-    {
-      id: 1,
-      category: "Food and Drinks",
-      price: 872.4,
-    },
-    {
-      id: 2,
-      category: "Groceries",
-      price: 1378.2,
-    },
-    {
-      id: 3,
-      category: "Rent or Mortgage",
-      price: 928.5,
-    },
-    {
-      id: 4,
-      category: "Utilities",
-      price: 420.7,
-    },
-    {
-      id: 5,
-      category: "Transportation",
-      price: 520,
-    },
-    {
-      id: 6,
-      category: "Clothing and Accessories",
-      price: 520,
-    },
-    {
-      id: 7,
-      category: "Entertainment",
-      price: 520,
-    },
-    {
-      id: 8,
-      category: "Travel",
-      price: 520,
-    },
-    {
-      id: 9,
-      category: "Gifts and Donations",
-      price: 520,
-    },
-    {
-      id: 10,
-      category: "Medical and Health",
-      price: 520,
-    },
-    {
-      id: 11,
-      category: "Insurance",
-      price: 520,
-    },
-    {
-      id: 12,
-      category: "Education",
-      price: 520,
-    },
-    {
-      id: 13,
-      category: "Home Maintenance and Repairs",
-      price: 520,
-    },
-    {
-      id: 14,
-      category: "Personal care",
-      price: 520,
-    },
-    {
-      id: 15,
-      category: "Miscellaneous",
-      price: 520,
-    },
-  ];
 
   return (
     <>
@@ -484,22 +379,22 @@ export default function Expenses() {
 
             <ul>
               {spendCategories.map((category) => (
-                <li key={category.id}>
+                <li key={category._id}>
                   <div className={styles.spendCategory}>
                     <p className={styles.spendCategoryName}>
                       {category.category}
                     </p>
                     <p className={styles.spendCategoryPrice}>
-                      {category.price.toFixed(2)}
+                      {category.amount}
                     </p>
                   </div>
                   <div className={styles.spendCategoryBar}>
                     <div
                       style={{
                         width: `${
-                          (category.price /
+                          (category.amount /
                             spendCategories.reduce(
-                              (acc, current) => acc + current.price,
+                              (acc, current) => acc + current.amount,
                               0
                             )) *
                           100
@@ -515,10 +410,11 @@ export default function Expenses() {
             <div className={styles.saveMoneyDiv}>
               <img className={styles.boxes} src={boxes} alt="boxes" />
               <img className={styles.plant} src={plant} alt="plant" />
-              <p className={styles.saveMoneyTitle}>Save more money</p>
+              <p className={styles.saveMoneyTitle}></p>
               <p className={styles.saveMoneyInfo}>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                Similique, a.
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Incidunt in odio repellat exercitationem, velit porro libero
+                officia nobis minima deleniti vel accusamus alias illo quidem
               </p>
               <button className={styles.button} type="button">
                 VIEW TIPS
