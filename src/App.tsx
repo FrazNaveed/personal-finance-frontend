@@ -28,15 +28,6 @@ function App() {
     );
   }
 
-  function RecommendationsPage() {
-    return (
-      <>
-        <Sidebar />
-        <Expenses />
-      </>
-    );
-  }
-
   function SettingsPage() {
     return (
       <>
@@ -63,11 +54,6 @@ function App() {
           <Route path="/logout" component={LoginPage} />
           <ProtectedRoute exact path="/dashboard" component={DashboardPage} />
           <ProtectedRoute exact path="/analytics" component={AnalyticsPage} />
-          <ProtectedRoute
-            exact
-            path="/recommendations"
-            component={RecommendationsPage}
-          />
           <ProtectedRoute exact path="/settings" component={SettingsPage} />
         </Switch>
       </Router>

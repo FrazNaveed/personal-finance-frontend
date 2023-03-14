@@ -8,6 +8,7 @@ import boxes from "../../assets/png/boxes.png";
 import plant from "../../assets/png/plant.png";
 import { validateDate } from "../../utils/validateDate";
 import { categories } from "../../utils/categories";
+import { categoryIconMap } from "../../utils/categoryIconMap";
 import { customStyles } from "../../utils/externalCSS";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -24,6 +25,22 @@ interface Expenses {
   _id: number;
 }
 
+interface prevExpenses {
+  _id: {
+    _date: string;
+  };
+  expenses: {
+    _id: number;
+    expenseName: string;
+    category: string;
+    date: string;
+    time: string;
+    amount: number;
+    userId: string;
+    __v: number;
+  }[];
+}
+
 export default function Expenses() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [expenseName, setExpenseName] = useState("");
@@ -32,9 +49,51 @@ export default function Expenses() {
   const [expenseTime, setExpenseTime] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
   const [todayExpenses, setTodayExpenses] = useState<Expenses[]>([]);
-  // const [previousExpenses, setPreviousExpenses] = useState([]);
+  const [previousExpenses, setPreviousExpenses] = useState<prevExpenses[]>([]);
   // const [spendCategories, setSpendCategories] = useState([]);
 
+  function handleKeyPress(event: any) {
+    if (event.key === "-" || event.key === "+") {
+      event.preventDefault();
+    }
+  }
+
+  const handleOpenModal = () => {
+    setModalIsOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalIsOpen(false);
+  };
+
+  useEffect(() => {
+    getTodayExpenses();
+    getPreviousExpenses();
+  }, []);
+
+  const getTodayExpenses = async () => {
+    const result = await axios.get(
+      `${process.env.REACT_APP_API}/getTodayExpenses`,
+      {
+        params: {
+          email: localStorage.getItem("email"),
+        },
+      }
+    );
+    setTodayExpenses(result.data);
+  };
+
+  const getPreviousExpenses = async () => {
+    const result = await axios.get(
+      `${process.env.REACT_APP_API}/getPreviousExpenses`,
+      {
+        params: {
+          email: localStorage.getItem("email"),
+        },
+      }
+    );
+    setPreviousExpenses(result.data);
+  };
   const handleAddExpense = async (e: any) => {
     const email = localStorage.getItem("email");
 
@@ -59,6 +118,8 @@ export default function Expenses() {
       }),
     })
       .then(async (res: any) => {
+        getTodayExpenses();
+        getPreviousExpenses();
         alert("Successfully Saved");
         handleCloseModal();
       })
@@ -66,45 +127,20 @@ export default function Expenses() {
         alert("Error Sending Data");
       });
   };
-
-  function handleKeyPress(event: any) {
-    if (event.key === "-" || event.key === "+") {
-      event.preventDefault();
-    }
-  }
-
-  const handleOpenModal = () => {
-    setModalIsOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalIsOpen(false);
-  };
-
-  useEffect(() => {
-    getTodayExpenses();
-  }, []);
-
-  const getTodayExpenses = async () => {
-    const result = await axios.get(
-      `${process.env.REACT_APP_API}/getTodayExpenses`,
-      {
-        params: {
-          email: localStorage.getItem("email"),
-        },
-      }
-    );
-    setTodayExpenses(result.data);
-  };
-
   const deleteExpense = async (id: number) => {
-    const result = await axios.post(
-      `${process.env.REACT_APP_API}/deleteExpense`,
-      {
-        id: id,
-      }
-    );
-    console.log(result);
+    try {
+      const result = await axios.post(
+        `${process.env.REACT_APP_API}/deleteExpense`,
+        {
+          id: id,
+        }
+      );
+      getTodayExpenses();
+      getPreviousExpenses();
+      alert(result.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // const todayExpenses = [
@@ -136,26 +172,26 @@ export default function Expenses() {
   //     iconBackgroundColor: "#FF8700",
   //   },
   // ];
-  const previousExpenses = [
-    {
-      id: 1,
-      expense: "Food and Drink",
-      time: "5:12 pm",
-      location: "xyz restaurant",
-      price: 156.0,
-      icon: cartIcon,
-      iconBackgroundColor: "#DC3434",
-    },
-    {
-      id: 2,
-      expense: "Entertainment",
-      time: "5:12 pm",
-      location: "cineplex",
-      price: 35.2,
-      icon: transportIcon,
-      iconBackgroundColor: "#4BA83D",
-    },
-  ];
+  // const previousExpenses = [
+  //   {
+  //     id: 1,
+  //     expense: "Food and Drink",
+  //     time: "5:12 pm",
+  //     location: "xyz restaurant",
+  //     price: 156.0,
+  //     icon: cartIcon,
+  //     iconBackgroundColor: "#DC3434",
+  //   },
+  //   {
+  //     id: 2,
+  //     expense: "Entertainment",
+  //     time: "5:12 pm",
+  //     location: "cineplex",
+  //     price: 35.2,
+  //     icon: transportIcon,
+  //     iconBackgroundColor: "#4BA83D",
+  //   },
+  // ];
 
   const spendCategories = [
     {
@@ -352,22 +388,30 @@ export default function Expenses() {
             </div>
 
             <ul>
-              {todayExpenses.map((expense: any) => (
+              {todayExpenses.map((expense: any, key) => (
                 <li className={styles.expenseItem} key={expense.id}>
                   <div className={styles.expenseItemLeft}>
                     <div
-                      style={{ backgroundColor: expense.iconBackgroundColor }}
+                      style={{
+                        backgroundColor:
+                          categoryIconMap[expense.category]?.backgroundColor ||
+                          "#7E7E7E",
+                      }}
                       className={styles.expenseItemDiv}
                     >
-                      <img src={cartIcon} alt={expense.expense} />
+                      <FontAwesomeIcon
+                        icon={categoryIconMap[expense.category]?.icon}
+                        style={{ color: "white" }}
+                      />
                     </div>
                     <div className={styles.expenseItemDetails}>
                       <p className={styles.expenseItemTitle}>
                         {expense.category}
                       </p>
                       <p className={styles.expenseItemTime}>
-                        {expense.time} • {expense.expenseName} • $
-                        {expense.amount}
+                        {expense.time}{" "}
+                        {parseInt(expense.time) >= 12 ? "PM" : "AM"} •{" "}
+                        {expense.expenseName} • ${expense.amount}
                       </p>
                     </div>
                   </div>
@@ -381,37 +425,58 @@ export default function Expenses() {
               ))}
             </ul>
 
-            <div className={styles.expensesOverviewHeader}>
-              <p className={styles.expensesOverviewTitle}>
-                Monday, 23 March 2020
-              </p>
-            </div>
-
-            <ul>
-              {previousExpenses.map((expense) => (
-                <li className={styles.expenseItem} key={expense.id}>
-                  <div className={styles.expenseItemLeft}>
-                    <div
-                      style={{ backgroundColor: expense.iconBackgroundColor }}
-                      className={styles.expenseItemDiv}
-                    >
-                      <img src={cartIcon} alt={expense.expense} />
-                    </div>
-                    <div className={styles.expenseItemDetails}>
-                      <p className={styles.expenseItemTitle}>
-                        {expense.expense}
-                      </p>
-                      <p className={styles.expenseItemTime}>
-                        {expense.time} • {expense.location} • ${expense.price}
-                      </p>
-                    </div>
-                  </div>
-                  <button className={styles.delete_btn}>
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {previousExpenses.map((report) => (
+              <div key={report._id._date}>
+                <div className={styles.expensesOverviewHeader}>
+                  {" "}
+                  <p className={styles.expensesOverviewTitle}>
+                    {new Date(report._id._date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                </div>
+                <ul>
+                  {report.expenses.map((expense) => (
+                    <li className={styles.expenseItem} key={expense._id}>
+                      <div className={styles.expenseItemLeft}>
+                        <div
+                          style={{
+                            backgroundColor:
+                              categoryIconMap[expense.category]
+                                ?.backgroundColor || "#7E7E7E",
+                          }}
+                          className={styles.expenseItemDiv}
+                        >
+                          <FontAwesomeIcon
+                            icon={categoryIconMap[expense.category]?.icon}
+                            style={{ color: "white" }}
+                          />
+                        </div>
+                        <div className={styles.expenseItemDetails}>
+                          <p className={styles.expenseItemTitle}>
+                            {expense.category}
+                          </p>
+                          <p className={styles.expenseItemTime}>
+                            {expense.time}{" "}
+                            {parseInt(expense.time) >= 12 ? "PM" : "AM"} •{" "}
+                            {expense.expenseName} • ${expense.amount}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        className={styles.delete_btn}
+                        onClick={() => deleteExpense(expense._id)}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </section>
 
           <section className={styles.moneyOverview}>
