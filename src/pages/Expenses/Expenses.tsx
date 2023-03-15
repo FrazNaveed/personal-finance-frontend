@@ -388,7 +388,9 @@ export default function Expenses() {
           </section>
 
           <section className={styles.moneyOverview}>
-            <p className={styles.moneyOverviewTitle}>Where'd your money go</p>
+            <p className={styles.moneyOverviewTitle}>
+              Where'd your money go this month
+            </p>
 
             <ul>
               {spendCategories.map((category) => (
