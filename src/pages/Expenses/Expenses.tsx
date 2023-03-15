@@ -54,6 +54,7 @@ export default function Expenses() {
   const [todayExpenses, setTodayExpenses] = useState<Expenses[]>([]);
   const [previousExpenses, setPreviousExpenses] = useState<prevExpenses[]>([]);
   const [spendCategories, setSpendCategories] = useState<spendCategories[]>([]);
+  const [tip, setTip] = useState<String>("");
 
   function handleKeyPress(event: any) {
     if (event.key === "-" || event.key === "+") {
@@ -105,6 +106,15 @@ export default function Expenses() {
     );
     setSpendCategories(result.data);
   }, [setSpendCategories]);
+
+  const getTip = async () => {
+    const tip = await axios.get(`http://localhost:5000/getSavingTip`, {
+      params: {
+        email: localStorage.getItem("email"),
+      },
+    });
+    setTip(tip.data);
+  };
 
   useEffect(() => {
     setTimeout(() => {
@@ -414,12 +424,8 @@ export default function Expenses() {
               <img className={styles.boxes} src={boxes} alt="boxes" />
               <img className={styles.plant} src={plant} alt="plant" />
               <p className={styles.saveMoneyTitle}></p>
-              <p className={styles.saveMoneyInfo}>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Incidunt in odio repellat exercitationem, velit porro libero
-                officia nobis minima deleniti vel accusamus alias illo quidem
-              </p>
-              <button className={styles.button} type="button">
+              <p className={styles.saveMoneyInfo}>{tip}</p>
+              <button className={styles.button} type="button" onClick={getTip}>
                 VIEW TIPS
               </button>
             </div>
