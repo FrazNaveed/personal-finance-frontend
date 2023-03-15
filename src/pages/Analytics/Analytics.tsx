@@ -1,35 +1,21 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import styles from "./Analytics.module.scss";
 import { categories } from "../../utils/categories";
-import {
-  BarChart,
-  Bar,
-  ResponsiveContainer,
-  Cell,
-  XAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-} from "recharts";
-
+import { BarChart, Bar, Cell, XAxis, Tooltip, PieChart, Pie } from "recharts";
+import axios from "axios";
 import { useState } from "react";
+
+interface MonthlyTotal {
+  _id: number;
+  totalAmount: number;
+  month_name: string;
+}
+
+type MonthlyTotals = MonthlyTotal[];
 
 export default function Expenses() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const data = [
-    { name: "Jan", value: 100 },
-    { name: "Feb", value: 200 },
-    { name: "Mar", value: 150 },
-    { name: "Apr", value: 300 },
-    { name: "May", value: 400 },
-    { name: "Jun", value: 250 },
-    { name: "July", value: 100 },
-    { name: "Aug", value: 200 },
-    { name: "Sept", value: 150 },
-    { name: "Oct", value: 300 },
-    { name: "Nov", value: 400 },
-    { name: "Dec", value: 250 },
-  ];
+  const [barData, setBarData] = useState<MonthlyTotals>([]);
 
   const piedata = useMemo(
     () =>
@@ -41,11 +27,66 @@ export default function Expenses() {
     [categories]
   );
 
-  const onMouseOver = (data: any, index: number) => setActiveIndex(index);
+  const onMouseOver = (barData: any, index: number) => setActiveIndex(index);
 
   const formatTooltip = (value: any) => {
     return `$${value}`;
   };
+
+  useEffect(() => {
+    getBarData();
+  }, []);
+
+  const getBarData = async () => {
+    const allMonths = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const monthlyTotals: MonthlyTotals = allMonths.map((month) => ({
+      _id: 0,
+      totalAmount: 0,
+      month_name: month,
+    }));
+
+    const result = await axios.get(
+      `${process.env.REACT_APP_API}/getBarChartData`,
+      {
+        params: {
+          email: localStorage.getItem("email"),
+        },
+      }
+    );
+
+    result.data.forEach(
+      ({
+        month_name,
+        totalAmount,
+      }: {
+        month_name: string;
+        totalAmount: number;
+      }) => {
+        const index = allMonths.indexOf(month_name);
+        if (index !== -1) {
+          monthlyTotals[index].totalAmount = totalAmount;
+        }
+      }
+    );
+
+    setBarData(monthlyTotals);
+    console.log(monthlyTotals);
+  };
+
   return (
     <>
       <div className={styles.expenses}>
@@ -56,18 +97,18 @@ export default function Expenses() {
             </div>
 
             <div className={styles.mainBody}>
-              <BarChart data={data} width={530} height={300}>
+              <BarChart data={barData} width={530} height={300}>
                 <XAxis
-                  dataKey="name"
+                  dataKey="month_name"
                   axisLine={{ stroke: "transparent" }}
                   tickLine={{ stroke: "transparent" }}
                 />
                 <Bar
-                  dataKey="value"
+                  dataKey="totalAmount"
                   fill="rgba(21, 122, 255, .2)"
                   onMouseOver={onMouseOver}
                 >
-                  {data.map((entry, index) => (
+                  {barData.map((entry, index) => (
                     <Cell
                       cursor="pointer"
                       fill={

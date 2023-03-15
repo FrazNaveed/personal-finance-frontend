@@ -122,6 +122,9 @@ export default function Expenses() {
       return;
     }
 
+    const date = new Date(expenseDate);
+    const monthName = date.toLocaleString("default", { month: "long" });
+
     await fetch("http://localhost:5000/saveExpense", {
       method: "POST",
       headers: {
@@ -136,6 +139,7 @@ export default function Expenses() {
         time: expenseTime,
         amount: expenseAmount,
         userId: email,
+        month: monthName,
       }),
     })
       .then(async (res: any) => {
