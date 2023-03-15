@@ -3,12 +3,7 @@ import { useState, useEffect } from "react";
 import samanthaImg from "../../assets/png/samantha.png";
 import { Link, useLocation } from "react-router-dom";
 
-const sidebarNavLinks = [
-  "dashboard",
-  "analytics",
-  "settings",
-  "logout",
-];
+const sidebarNavLinks = ["dashboard", "analytics", "settings", "logout"];
 
 const handleLogout = () => {
   localStorage.removeItem("token");

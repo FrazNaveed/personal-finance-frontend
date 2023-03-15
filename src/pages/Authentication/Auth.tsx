@@ -4,12 +4,19 @@ import { useHistory } from "react-router-dom";
 import "./Auth.css";
 
 export default function (props: any) {
+  function handleKeyPress(event: any) {
+    if (event.key === "-" || event.key === "+") {
+      event.preventDefault();
+    }
+  }
+
   const history = useHistory();
   let [authMode, setAuthMode] = useState("signin");
   const [fname, setfname] = useState("");
   const [lname, setlname] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const [income, setIncome] = useState("");
 
   const [_email, set_email] = useState("");
   const [_password, set_password] = useState("");
@@ -32,10 +39,10 @@ export default function (props: any) {
         lname: lname,
         email: email,
         password: password,
+        income: income,
       }),
     });
     const data = await response.json();
-    console.log(data);
     if (data.status === "ok") {
       alert("Successfully Created User");
     } else {
@@ -60,6 +67,7 @@ export default function (props: any) {
     });
     const data = await response.json();
     if (data.status === "ok") {
+      localStorage.clear();
       localStorage.setItem("token", data.data);
       history.push("/Dashboard");
     } else {
@@ -142,6 +150,21 @@ export default function (props: any) {
               placeholder="Last Name"
               onChange={(e) => {
                 setlname(e.target.value);
+              }}
+            />
+          </div>
+          <div className="form-group mt-3">
+            <label>Income</label>
+
+            <input
+              type="number"
+              placeholder="Enter Monthly Income"
+              className="form-control mt-1"
+              step="any"
+              min="0"
+              onKeyPress={handleKeyPress}
+              onChange={(e) => {
+                setIncome(e.target.value);
               }}
             />
           </div>

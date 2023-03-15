@@ -1,9 +1,6 @@
 import styles from "./Expenses.module.scss";
 import Modal from "react-modal";
-import { useState, useEffect } from "react";
-import cartIcon from "../../assets/svg/cartIcon.svg";
-import transportIcon from "../../assets/svg/transportIcon.svg";
-import houseIcon from "../../assets/svg/houseIcon.svg";
+import { useState, useEffect, useCallback } from "react";
 import boxes from "../../assets/png/boxes.png";
 import plant from "../../assets/png/plant.png";
 import { validateDate } from "../../utils/validateDate";
@@ -72,13 +69,7 @@ export default function Expenses() {
     setModalIsOpen(false);
   };
 
-  useEffect(() => {
-    getTodayExpenses();
-    getPreviousExpenses();
-    getCategoriesSpending();
-  }, []);
-
-  const getTodayExpenses = async () => {
+  const getTodayExpenses = useCallback(async () => {
     const result = await axios.get(
       `${process.env.REACT_APP_API}/getTodayExpenses`,
       {
@@ -88,9 +79,9 @@ export default function Expenses() {
       }
     );
     setTodayExpenses(result.data);
-  };
+  }, [setTodayExpenses]);
 
-  const getPreviousExpenses = async () => {
+  const getPreviousExpenses = useCallback(async () => {
     const result = await axios.get(
       `${process.env.REACT_APP_API}/getPreviousExpenses`,
       {
@@ -100,9 +91,10 @@ export default function Expenses() {
       }
     );
     setPreviousExpenses(result.data);
-  };
+  }, [setPreviousExpenses]);
 
-  const getCategoriesSpending = async () => {
+  const getCategoriesSpending = useCallback(async () => {
+    const _email = await localStorage.getItem("email");
     const result = await axios.get(
       `${process.env.REACT_APP_API}/getCategoriesSpending`,
       {
@@ -112,8 +104,15 @@ export default function Expenses() {
       }
     );
     setSpendCategories(result.data);
-    console.log(result.data);
-  };
+  }, [setSpendCategories]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      getCategoriesSpending();
+      getPreviousExpenses();
+      getTodayExpenses();
+    }, 1000);
+  }, []);
 
   const handleAddExpense = async (e: any) => {
     const email = localStorage.getItem("email");

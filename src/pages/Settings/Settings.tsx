@@ -19,7 +19,7 @@ export default function Expenses() {
               <div className={styles.textbox_container}>
                 <input
                   type="number"
-                  placeholder="Enter Annual Income"
+                  placeholder="Update Monthly Income"
                   className={styles.textbox}
                   step="any"
                   min="0"

@@ -11,21 +11,25 @@ interface MonthlyTotal {
   month_name: string;
 }
 
+interface CategoryTotal {
+  totalAmount: number;
+  category: string;
+}
+
 type MonthlyTotals = MonthlyTotal[];
 
 export default function Expenses() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [barData, setBarData] = useState<MonthlyTotals>([]);
+  const [pieData, setPieData] = useState<CategoryTotal[]>([]);
 
-  const piedata = useMemo(
-    () =>
-      categories.map((category, index) => ({
-        name: category,
-        value: Math.floor(Math.random() * 1000),
-        color: `hsl(${(index * 360) / categories.length}, 70%, 50%)`,
-      })),
-    [categories]
-  );
+  const piedata = useMemo(() => {
+    return pieData.map((data, index) => ({
+      name: data.category,
+      value: data.totalAmount,
+      color: `hsl(${(index * 360) / pieData.length}, 70%, 50%)`,
+    }));
+  }, [pieData]);
 
   const onMouseOver = (barData: any, index: number) => setActiveIndex(index);
 
@@ -35,6 +39,7 @@ export default function Expenses() {
 
   useEffect(() => {
     getBarData();
+    getPieData();
   }, []);
 
   const getBarData = async () => {
@@ -84,7 +89,19 @@ export default function Expenses() {
     );
 
     setBarData(monthlyTotals);
-    console.log(monthlyTotals);
+  };
+
+  const getPieData = async () => {
+    const result = await axios.get(
+      `${process.env.REACT_APP_API}/getPieChartData`,
+      {
+        params: {
+          email: localStorage.getItem("email"),
+        },
+      }
+    );
+
+    setPieData(result.data);
   };
 
   return (
