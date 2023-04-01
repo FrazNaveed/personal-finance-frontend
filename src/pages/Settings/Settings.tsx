@@ -21,7 +21,7 @@ export default function Expenses() {
     console.log("heres");
     const email = localStorage.getItem("email");
 
-    const response = await fetch("http://localhost:5000/updateIncome", {
+    const response = await fetch(`${process.env.REACT_APP_API}/updateIncome`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export default function Expenses() {
   const updatePassword = async () => {
     const email = localStorage.getItem("email");
 
-    const response = await fetch("http://localhost:5000/updatePassword", {
+    const response = await fetch(`${process.env.REACT_APP_API}/updatePassword`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

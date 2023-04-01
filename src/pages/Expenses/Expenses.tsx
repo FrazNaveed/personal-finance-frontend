@@ -108,7 +108,7 @@ export default function Expenses() {
   }, [setSpendCategories]);
 
   const getTip = async () => {
-    const tip = await axios.get(`http://localhost:5000/getSavingTip`, {
+    const tip = await axios.get(`${process.env.REACT_APP_API}/getSavingTip`, {
       params: {
         email: localStorage.getItem("email"),
       },
@@ -134,7 +134,7 @@ export default function Expenses() {
     const date = new Date(expenseDate);
     const monthName = date.toLocaleString("default", { month: "long" });
 
-    await fetch("http://localhost:5000/saveExpense", {
+    await fetch(`${process.env.REACT_APP_API}/saveExpense`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

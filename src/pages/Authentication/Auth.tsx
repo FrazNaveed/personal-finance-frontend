@@ -27,7 +27,7 @@ export default function (props: any) {
 
   const handleSubmitSignup = async (e: any) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/register", {
+    const response = await fetch(`${process.env.REACT_APP_API}/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export default function (props: any) {
   const handleSubmitSignIn = async (e: any) => {
     e.preventDefault();
 
-    const response = await fetch("http://localhost:5000/login-user", {
+    const response = await fetch(`${process.env.REACT_APP_API}/login-user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
